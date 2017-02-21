@@ -74,7 +74,7 @@ namespace Orchard.Taxonomies.Drivers {
 
                 var settings = field.PartFieldDefinition.Settings.GetModel<TaxonomyFieldSettings>();
                 if (settings.Required && !checkedTerms.Any()) {
-                    updater.AddModelError(GetPrefix(field, part), T("The field {0} is mandatory.", T(field.DisplayName)));
+                    updater.AddModelError(GetPrefix(field, part), T("The {0} field is required.", T(field.DisplayName)));
                 }
                 else
                     _taxonomyService.UpdateTerms(part.ContentItem, checkedTerms, field.Name);
@@ -117,13 +117,10 @@ namespace Orchard.Taxonomies.Drivers {
         }
 
         protected override void Exporting(ContentPart part, TaxonomyField field, ExportContentContext context) {
-            var appliedTerms = _taxonomyService.GetTermsForContentItem(part.ContentItem.Id, field.Name);
-
+            var appliedTerms = _taxonomyService.GetTermsForContentItem(part.ContentItem.Id, field.Name);    
             // stores all content items associated to this field
             var termIdentities = appliedTerms.Select(x => Services.ContentManager.GetItemMetadata(x).Identity.ToString()).ToArray();
-
-            if (termIdentities.Any())
-                context.Element(XmlConvert.EncodeLocalName(field.FieldDefinition.Name + "." + field.Name)).SetAttributeValue("Terms", String.Join(",", termIdentities));
+            context.Element(XmlConvert.EncodeLocalName(field.FieldDefinition.Name + "." + field.Name)).SetAttributeValue("Terms", String.Join(",", termIdentities));
         }
 
         protected override void Importing(ContentPart part, TaxonomyField field, ImportContentContext context) {
